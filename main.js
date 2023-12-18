@@ -71,6 +71,9 @@ class cAsteroide extends Phaser.Physics.Arcade.Sprite {
   constructor(scene, x, y) {
 
         super(scene, x, y, 'astedoide')
+
+        
+
         scene.add.existing(this)
         scene.physics.add.existing(this) 
         
@@ -103,9 +106,66 @@ class cAsteroide extends Phaser.Physics.Arcade.Sprite {
 }
 
 
-class cTiro extends Phaser.Physics.Arcade.Sprite {
+//essa é a classe que o phaser vai usar para criar o player
 
-  constructor(scene, x, y) {
+class cNave extends Phaser.Physics.Arcade.Sprite {
+  
+    constructor(scene, x, y) {
+  
+      super(scene, x, y, 'player');
+      scene.add.existing(this);
+      scene.physics.add.existing(this);
+     
+      this.setState = this.getTime();
+      this.scene = scene;
+      this.x = x;
+      this.y = y;
+      this.playerSpeed = 1000;
+      this.body = scene.body;
+     
+ 
+      this.setImmovable(true)
+      
+
+    
+      
+
+    }
+    
+    preUpdate(time, delta) {
+      super.preUpdate(time, delta)
+      
+      this.x += Math.sin(this.scene.time.now / 220) * 0.3
+      this.y += Math.cos(this.scene.time.now / 420) * 0.3
+
+      
+     
+      this.body.setAllowGravity(false)
+      this.setCollideWorldBounds(true)
+      this.setDragX(1000)
+
+      const { left, right, up, down } = this.scene.cursor;
+        
+            if (left.isDown) {
+              this.setAccelerationX(-this.playerSpeed);
+            } else if (right.isDown) {
+              this.setAccelerationX(this.playerSpeed);
+            } else {
+              this.setAccelerationX(0);
+            }
+            
+    }
+
+          getTime() {
+            let d = new Date();
+        
+            return d.getTime();
+          }
+  }
+
+      class cTiro extends Phaser.Physics.Arcade.Sprite {
+
+        constructor(scene, x, y) {
 
     super(scene, x+18, y, 'tiro')
     scene.add.existing(this)
@@ -157,6 +217,9 @@ class GameScene extends Phaser.Scene {
   }
 
 
+
+
+
   preUpdate(time, delta) {
     this.delta = delta
   
@@ -185,14 +248,13 @@ class GameScene extends Phaser.Scene {
     this.add.image(0, 0, 'bg1').setOrigin(0, 0);
     this.textScore = this.add.text((sizes.width / 2) - 90, 0, 'Score : 0');
 
-    this.textScore.setFontSize(30)
-    this.textScore.setFont('PressStart2P')
-    this.player = this.physics.add.image(sizes.width / 2, sizes.height - 50, 'player').setOrigin(0, 0)
-    this.player.setImmovable(true)
-    this.player.body.setAllowGravity(false)
-    this.player.setCollideWorldBounds(true)
-    this.player.setDragX(1000)
-    this.cursor = this.input.keyboard.createCursorKeys()
+    this.textScore.setFontSize(30);
+    this.textScore.setFont('PressStart2P');
+
+    this.cursor = this.input.keyboard.createCursorKeys();
+
+    const player = new cNave(this, sizes.width / 2, sizes.height - 50);
+    this.player = player;
     this.timedEvent = this.time.addEvent({ delay: 1000, callback: this.onEvent, callbackScope: this, loop: true });
     this.timedEvent2 = this.time.addEvent({ delay: tiro.intervalo, callback: this.atira, callbackScope: this, loop: true });
 
@@ -252,20 +314,7 @@ class GameScene extends Phaser.Scene {
   });    
 
     this.textScore.setText('score : ' + score)
-    this.player.x += Math.sin(this.time.now / 220) * 0.3
-    this.player.y += Math.cos(this.time.now / 420) * 0.3
-    const { left, right, up, down } = this.cursor
-
-
-
-    if (left.isDown) {
-      this.player.setAccelerationX(-this.playerSpeed)
-    } else if (right.isDown) {
-      this.player.setAccelerationX(this.playerSpeed)
-    } else {
-      this.player.setAccelerationX(0)
-
-    }
+    
   }
 }
 
