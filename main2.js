@@ -23,13 +23,46 @@ class Explosao extends Phaser.Physics.Arcade.Sprite {
     }   
 }
 
-class Astedoide extends Phaser.Physics.Arcade.Sprite {
+class Drop extends Phaser.Physics.Arcade.Sprite {
     constructor(scene, x, y) {
-        super(scene, x, y, 'astedoide')
+
+        const ImgDrops = ['powerup1', 'powerup2', 'powerup3', 'powerup4', 'powerup5', 'powerup6', 'powerup7', 'gem1', 'gem2', 'gem3', 'gem4']
+        
+        super(scene, x, y, ImgDrops[Phaser.Math.Between(0, 10)])
+
         this.scene = scene
         this.scene.physics.world.enable(this)
         this.scene.add.existing(this)
-        this.setScale(0.8)
+    
+        this.setImmovable(true)
+        this.setScale(1)
+        this.setVelocityY(Phaser.Math.Between(100, 200))
+        this.setGravityY(50)
+    
+        this.scene.physics.add.collider(this, this.scene.player, this.ColisaoPlayer, null, this);
+        this.timedEvent = this.scene.time.addEvent({ delay: 5000, callback: this.destroi, callbackScope: this, loop: false });        
+    }
+    
+    destroi() {
+        this.destroy()
+    }
+
+    ColisaoPlayer(sprite, player)  {   
+        this.destroi()
+
+    }
+}
+
+class Astedoide extends Phaser.Physics.Arcade.Sprite {
+    constructor(scene, x, y) {
+      
+        const ImgAsteroides = ['astedoide1', 'astedoide2', 'astedoide3', 'astedoide4', 'astedoide5']
+
+        super(scene, x, y, ImgAsteroides[Phaser.Math.Between(0, 4)])
+        this.scene = scene
+        this.scene.physics.world.enable(this)
+        this.scene.add.existing(this)
+        this.setScale(1)
         this.setVelocityY(Phaser.Math.Between(100, 200))
         this.setCollideWorldBounds(false)
         this.setBounce(1)
@@ -58,8 +91,13 @@ class Astedoide extends Phaser.Physics.Arcade.Sprite {
         new Explosao(this.scene, this.x-desvio, this.y+desvio)  
         desvio = Phaser.Math.Between(-10, 10)
         new Explosao(this.scene, this.x+desvio, this.y+desvio)  
+
+        new Drop(this.scene, this.x, this.y)
+
         this.destroy();
         tiro.destroy();
+
+        
     }
     ColisaoPlayer(sprite, player)  {       
 
@@ -173,17 +211,36 @@ class Player extends Phaser.Physics.Arcade.Sprite {
       this.GrupoTiros
       this.AnimExplosao
       this.AnimFogo
-      
-   
-      
-    
+      this.ImgAsteroides = []
+
     }           
 
 
     preload() {
-        this.load.image('bg1', 'assets/Background/5.png')
+        this.load.image('bg1', 'assets/Background/3b.png')
         this.load.image('player', 'assets/Ship/3.png')
-        this.load.image('astedoide', 'assets/Background/Meteor1.png')
+        
+        this.load.image('astedoide1', 'assets/Background/Meteor1.png')
+        this.load.image('astedoide2', 'assets/Background/Meteor2.png')
+        this.load.image('astedoide3', 'assets/Background/Meteor3.png')
+        this.load.image('astedoide4', 'assets/Background/Meteor4.png')
+        this.load.image('astedoide5', 'assets/Background/Meteor5.png')
+        
+        this.load.image('powerup1', 'assets/Item/PowerUp1.png')
+        this.load.image('powerup2', 'assets/Item/PowerUp2.png')
+        this.load.image('powerup3', 'assets/Item/PowerUp3.png')
+        this.load.image('powerup4', 'assets/Item/PowerUp4.png')
+        this.load.image('powerup5', 'assets/Item/PowerUp5.png')
+        this.load.image('powerup6', 'assets/Item/PowerUp6.png')
+        this.load.image('powerup7', 'assets/Item/PowerUp7.png')
+
+        this.load.image('gem1', 'assets/Item/Gem1.gif')
+        this.load.image('gem2', 'assets/Item/Gem2.gif')
+        this.load.image('gem3', 'assets/Item/Gem3.gif')
+        this.load.image('gem4', 'assets/Item/Gem4.gif')
+
+
+
         this.load.image('tiro', 'assets/Shoot/1.png')
         this.load.spritesheet('explosao', 'assets/Fx/Fx1.png', { frameWidth: 38, frameHeight: 38, numberOfFrames: 6 })
         this.load.spritesheet('fogo', 'assets/Fx/Fx6.png', { frameWidth: 12, frameHeight: 28, numberOfFrames: 6 })
