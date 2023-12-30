@@ -1,49 +1,15 @@
-// build a top down shooter using Phaser 3
-//using oo programming
-// must have patterns for the enemies
-// must have patterns for the shots fired by the player
-// must have patterns for the enemies shots
-// must have patterns for the enemies movement
-// must have patterns for the enemies spawn
-// it must draw inspiration from the game Galaga, vampire survivors, and other top down shooters
-// must have a health bar
-// must have a score
-// must have a level
-// must have a game over screen
-// must have a start screen
-// must have a pause screen
-// must have a way to restart the game
-// must have a way to pause the game
-// must have a way to quit the game
-// must have a way to mute the game
-// must have a way to unmute the game
-// must have a way to mute the music
-// must have a way to unmute the music
-// must have a way to mute the sound effects
-// must have a way to unmute the sound effects
-// must have some dash like moviments
-// the shots must have a cooldown
-// on every 10 points the level must increase
-// the enemies must have a health bar
-// the enemies must have a way to shoot
-// the enemies must have a way to move
-// the enemies must have a way to spawn
-// the enemies must have a way to die
-// the enemies must have a way to drop items
-// the enemies must have a way to drop power ups
-// every level up the player must choose a power up to use and it must be random
-// the player must have a way to shoot
-// the player must have a way to move
-// the player must have a way to die
-// the player must have a way to dash
-
 //import './style.css'
 
 
 //import Phaser from 'phaser';
 
-
-
+const tempoSpawnInimigo = 100; // Reduzindo o tempo de spawn dos inimigos para aumentar a intensidade do jogo
+const TempoEntreGruposInimigos = 1200; // Diminuindo o tempo entre grupos de inimigos para manter a ação constante
+const TempoEntreWaves = 1500; // Aumentando o tempo entre as waves para permitir momentos de recuperação entre os desafios
+const TempodeumaWave = 15000; // Reduzindo o tempo de uma wave para manter a jogabilidade intensa
+const tempoTextEntrewaves = 1000; // Reduzindo o tempo entre as waves para manter a jogabilidade intensa
+const width = 400
+const height = 800
 
 const tiroInimigo1 = {
 
@@ -53,12 +19,12 @@ const tiroInimigo1 = {
     nivelmax: 3,
     multiplicador: 0.25,
     frequencia: 1000,
-    escala: 1,
+    escala: 0.5,
     velocidadetiro: 1000,
     tempodevida: 1000,
     inimigo: true,
     
-    tipo: 'tiro'
+    tipo: 'tiro10'
 }
 const tiroInimigo2 = {
     dano:1,
@@ -67,17 +33,17 @@ const tiroInimigo2 = {
     nivelmax: 3,
     multiplicador: 0.25,
     frequencia: 1000,
-    escala: 1,
+    escala: 0.6,
     velocidadetiro: 1000,
     inimigo: true,
     tempodevida: 1000,
-    tipo: 'tiro2'
+    tipo: 'tiro5'
 }
 
 
 const tiroInimigoLentoCurto = {
     ...tiroInimigo1,
-    velocidadetiro: 120,
+    velocidadetiro: 320,
     tempodevida: 2000,
     frequencia: 1400
 }
@@ -99,16 +65,17 @@ const tiroinimigoNave1 = {
 
 const enemynave4 = {
             
+            maxporgrupo: 2,
             atirador: true,
             life: 2,
-            criadude: false,
+            criadude: true,
             segundoMovimento: false,
             EventoMorre: 8000,
             frequenciadetiro: 2000,
             velocidadetiro: 2000,
             PodeMaior: true,
             drop: ['gem2',"gem3"],
-            vely: 150,
+            vely: 200,
             score: 3,
             hasThruster: true,
             tipo: 'enemynave4',
@@ -120,6 +87,7 @@ const enemynave1 = {
     drop: ['gem3','gem4'],
     score: 1,
     hasThruster: true,
+    criadude: false,
     tipo: 'enemynave1',
     tipoTiro: tiroInimigoNave2
 }
@@ -130,6 +98,7 @@ const enemynave2 = {
     drop: ['gem2','gem1'],
     score: 2,
     hasThruster: true,
+    criadude: false,
     tipo: 'enemynave2',
     tipoTiro: tiroinimigoNave1
 
@@ -141,15 +110,19 @@ const enemynave3 = {
     drop: ['gem3','gem1'],
     score: 3,
     tipo: 'enemynave3',
+    criadude: false,
     hasThruster: true,
     tipoTiro: tiroinimigoNave1
 }
 
 const bebezinho = {
     ...enemynave4,
+    maxporgrupo: 3,
     life: 1,
     drop: ['gem1','gem2'],
+    vely: 350,
     hasThruster: false,
+    criadude: false,
     tipo: 'bebezinho',
     score: 1,
     tipoTiro: tiroInimigoLentoCurto,
@@ -157,9 +130,12 @@ const bebezinho = {
 
 const dude = {
     ...enemynave4,
+    maxporgrupo: 3,
     life: 1,
     drop: ['gem1','gem2'],
     score: 1,
+    vely: 350,
+    criadude: false,
     tipo: 'dude',
     hasThruster: false,
     tipoTiro: tiroInimigoLentoCurto
@@ -168,9 +144,12 @@ const dude = {
 
 const jelly = {
     ...enemynave4,
+    maxporgrupo: 3,
     life: 2,
     drop: ['gem1'],
     score: 1,
+    vely: 450,
+    criadude: false,
     tipo: 'jelly',
     tipoTiro: tiroInimigo1,
     hasThruster: false,
@@ -178,11 +157,14 @@ const jelly = {
 }
 
 const jelly2 = {
+    maxporgrupo: 4,
     ...enemynave4,
     life: 1.5,
     drop: ['gem1'],
     score: 2,
+    criadude: false,
     tipo: 'jelly2',
+    vely: 400,
     tipoTiro: tiroInimigo1,
     hasThruster: false,
     atirador: false
@@ -190,16 +172,19 @@ const jelly2 = {
 
 const boss1 = {
     ...enemynave3,
+    maxporgrupo: 1,
     life: 10,
     drop: ['gem4'],
     score: 10,
     tipo: 'boss1',
+    criadude: true,
     hasThruster: true,
     tipoTiro: tiroInimigo1
 }
 
 const boss2 = {
     ...enemynave3,
+    maxporgrupo: 1,
     life: 15,
     drop: ['gem5'],
     score: 15,
@@ -210,7 +195,8 @@ const boss2 = {
 
 const boss3 = {
     ...enemynave3,
-    life: 20,
+    maxporgrupo: 1,
+    life: 10,
     drop: ['gem6'],
     score: 20,
     tipo: 'boss3',
@@ -222,7 +208,7 @@ const tiroP = {
             nome:'Devastador',
             descricao: 'Tiro devastador, mas lento',
             icone: 'powerup1',
-            dano:1.2,
+            dano:1.5,
             nivel: 0,
             nivelmax: 3,
             multiplicador: 0.25,
@@ -365,6 +351,39 @@ const missel = {
             tipo: 'rocket'
 }
 
+const life = {
+    nome:'Life',
+    descricao:'Life',
+    icone: 'fulllife',
+    dano:1,
+    cooldown: 1000,
+    nivel: 1,
+    nivelmax: 3,
+    multiplicador: 0.25,
+    velocidadetiro: 300,
+    tempodevida: 600,
+    frequencia: 600,
+    atira: false,
+    tipo: 'life'
+}
+const shield = {
+    nome:'Shield',
+    descricao:'Shield',
+    icone: 'shield',
+    dano:1,
+    cooldown: 1000,
+    nivel: 1,
+    nivelmax: 3,
+    multiplicador: 0.25,
+    velocidadetiro: 300,
+    tempodevida: 600,
+    frequencia: 600,
+    atira: false,
+    tipo: 'shield'
+}
+
+
+
 
 
 const DanoBaseRocket = 2
@@ -400,6 +419,8 @@ const pattern3 = [
 ];
 
 
+
+
 const padroes = [pattern1, pattern2, pattern3]
 
 const TiposInimigos = ['enemynave1', 'enemynave2', 'enemynave3', 'enemynave4', 'boss1', 'boss2', 'boss3', 'dude', 'jelly', 'jelly2', 'bebezinho', 'asteroide']
@@ -411,18 +432,6 @@ const FXExplosao = ['fx1', 'fx2', 'fx3', 'fx4','fx7']
 const FXFire = ['fxfire', 'fx8', 'fx9']
 const FXMisc = ['fx5', 'fx6']
 
-//essa classe é responsavel por criar satelites que orbitam o player
-//a imagem que será usada é a assets/Item/Bomb.png
-//o satelite deve orbitar o player
-//o satelite deve atirar em inimigos
-//o satelite deve ser destruido quando o player morrer
-//o satelite NÃO deve ser destruido quando o player atirar nele
-//o satelite Não deve ser destruido quando um inimigo atirar nele
-//o satelite Não deve ser destruido quando um inimigo colidir com ele
-//o inimigo deve ser destruido quando o satelite colidir com ele
-//o satelite deve ter um cooldown de tiro
-//o satelite deve ter um tipo de tiro
-//o satelite deve ter um dano
 class Rocket extends Phaser.Physics.Arcade.Sprite {
     constructor(scene, x, y, esquerda = true) {
         super(scene, x - 30, y, 'rocket');
@@ -747,7 +756,7 @@ class FX extends Phaser.Physics.Arcade.Sprite {
         this.scene = scene
         this.scene.physics.world.enable(this)
         this.scene.add.existing(this)
-        this.setScale(1)
+        this.setScale(Phaser.Math.FloatBetween(1, 3))
         this.setVelocityY(0)
         
         this.play(fx)
@@ -775,14 +784,31 @@ class Drop extends Phaser.Physics.Arcade.Sprite {
         this.scene = scene
         this.scene.physics.world.enable(this)
         this.scene.add.existing(this)
-    
+
         this.setImmovable(true)
-        this.setScale(1)
-        this.setVelocityY(Phaser.Math.Between(100, 200))
-        this.setGravityY(50)
-    
+        this.setScale(1.25)
+        this.setVelocityY(Phaser.Math.Between(300, 400))
+        this.setGravityY(550)
+
         this.scene.physics.add.collider(this, this.scene.player, this.ColisaoPlayer, null, this);
-        this.timedEvent = this.scene.time.addEvent({ delay: 5000, callback: this.destroi, callbackScope: this, loop: false });        
+        this.timedEvent = this.scene.time.addEvent({ delay: 3000, callback: this.destroi, callbackScope: this, loop: false });        
+    }
+
+    preUpdate(time, delta) {
+        super.preUpdate(time, delta);
+
+        // Calculate the direction towards the player
+        const directionX = this.scene.player.x - this.x;
+        const directionY = this.scene.player.y - this.y;
+
+        // Normalize the direction vector
+        const length = Math.sqrt(directionX * directionX + directionY * directionY);
+        const normalizedDirectionX = directionX / length;
+        const normalizedDirectionY = directionY / length;
+
+        // Set the velocity towards the player
+        const speed = 159; // Adjust the speed as needed
+        this.setVelocity(normalizedDirectionX * speed, normalizedDirectionY * speed+ 500);
     }
     
     destroi() {
@@ -805,49 +831,8 @@ class Drop extends Phaser.Physics.Arcade.Sprite {
             this.scene.score += 5
         }
         this.scene.updateUI()
-        switch (this.drop) {
-            case 'powerup1':
-                player.setTipoTiro('P')
-
-                
-                break;
-            case 'powerup2':
-                player.setTipoTiro('B')
-
-                
-                break;
-            case 'powerup3':
-                player.setTipoTiro('R')
- 
-             
-                break;
-            case 'powerup4':
-                player.setTipoTiro('E')
-          
-                
-                break;
-            case 'powerup5':
-                player.setTipoTiro('S')
-       
-                
-                break;
-            case 'powerup6':
-                player.setTipoTiro('S2')
-         
-                
-                break;
-            case 'powerup7':
-                player.setTipoTiro('D')
+               
         
-                
-                break;
-            default:
-                break;
-        }
-    
-        
-        
-        this.scene.updateUI()
         player.blink()
 
         this.destroi()
@@ -924,7 +909,6 @@ class Inimigo extends Phaser.Physics.Arcade.Sprite {
         this.tipodetiro = tipoinimigo.tipoTiro
 
         this.EventoMovimento = 800
-        //this.EventoTiro = 1000
         this.EventoMorre = tipoinimigo.EventoMorre
         
         this.thruster = null;
@@ -1100,14 +1084,16 @@ class Inimigo extends Phaser.Physics.Arcade.Sprite {
         {
 
             this.thruster = this.scene.add.particles(this.x, this.y, this.scene.textures.get('fxfire'), {
-                scale: { start: 1, end: 0    },
+                scale: { start: 1, end: 0 },
                 alpha: { start: 1, end: 0 },
                 rotate: { start: 0, end: 360, ease: 'Back.easeOut' },
                 speed: { min: 100, max: 100 },
-                lifespan: 150,
-                frequency: 15,
+                lifespan: 50,
+                frequency: 7,
                 gravityY: -11190,
-                blendMode: 'ADD'
+                blendMode: 'ADD',
+                
+
             });
 
         }
@@ -1116,7 +1102,7 @@ class Inimigo extends Phaser.Physics.Arcade.Sprite {
 
     smokeup()
     {
-        for (var i = 0; i < 7; i++) {
+        for (var i = 0; i < 3; i++) {
             new FX(this.scene, this.x-Phaser.Math.Between(-20,20), this.y+Phaser.Math.Between(-20,20), -1, ['fxsmoke'])
         }
 
@@ -1171,17 +1157,23 @@ class Inimigo extends Phaser.Physics.Arcade.Sprite {
 
         
        // console.log(this.arma)
-        this.scene.GrupoTirosInimigos.add ( new Tiro(this.scene, this.x, this.y+10, -1,this.velocidadetiro,false,this.arma,true))
+        this.scene.GrupoTirosInimigos.add ( new Tiro(this.scene, this.x, this.y+10, -1,this.velocidadetiro,false,this.arma,true).setScale(this.arma.escala* -1))
         
         if (this.maior === true) {
-            this.scene.GrupoTirosInimigos.add ( new Tiro(this.scene, this.x+10, this.y+10, -1, this.velocidadetiro,false, this.arma,true))
+            this.scene.GrupoTirosInimigos.add ( new Tiro(this.scene, this.x+10, this.y+10, -1, this.velocidadetiro,false, this.arma,true).setScale(this.arma.escala * -1))
         }
     }   
 
 
 
     ColisaoTiros(sprite, tiro) {
+        this.setTint(0xffa500); // Laranja
+
         
+        this.scene.time.delayedCall(400, () => {
+            this.clearTint();
+        });
+
         var desvio = Phaser.Math.Between(-10, 10)
         new FX(this.scene, this.x-desvio, this.y+desvio,-1, FXExplosao)
         desvio = Phaser.Math.Between(-10, 10)
@@ -1213,9 +1205,14 @@ class Inimigo extends Phaser.Physics.Arcade.Sprite {
 
     destroi() {
         if (this.active === false) {return}
-        if (this.hasThruster){this.thruster.destroy()}
+        if (this.hasThruster){
+            
+            this.thruster.destroy()
+        
+        }
         
         this.smokeup()
+        
         this.destroy()
 
         
@@ -1233,6 +1230,7 @@ class Inimigo extends Phaser.Physics.Arcade.Sprite {
             new FX(this.scene, this.x-desvio, this.y+desvio)
             desvio = Phaser.Math.Between(-10, 10)
             new FX(this.scene, this.x+desvio, this.y+desvio)
+            this.scene.GrupoInimigos.remove(this)
             new Drop(this.scene, this.x, this.y, this.drops)
             
             this.destroi()
@@ -1355,6 +1353,8 @@ class Tiro extends Phaser.Physics.Arcade.Sprite {
         
     }
     destroi() {
+        this.timeEvent = null
+
         this.destroy()
     }   
 
@@ -1366,7 +1366,7 @@ class Tiro extends Phaser.Physics.Arcade.Sprite {
         //this.y += Math.cos(time / 100) /50
 
         if (this.y < 0) {
-            this.destroy()
+            this.destroi()
         }
     }
 
@@ -1382,10 +1382,10 @@ class ThrusterEmitter {
             y: y,
             //speed: { min: -100, max: 100 },
             //scale: { start: 1, end: 0 },
-            lifespan: 500,
+            lifespan: 100,
            // blendMode: 'ADD',
             //frequency: 50,
-            quantity: 5,
+            quantity: 1,
            // gravityY: 200,
             on: false
         });
@@ -1448,16 +1448,7 @@ class Player extends Phaser.Physics.Arcade.Sprite {
         this.energia = 1
 
         this.energycooldown = 1000
-
-        //todo momento que o player atira ele perde energia
-        //todo momento que o player toma tiro ele perde primeiro 
-        //energia que é usada pra manter o shield e depois vida
-        //se a energia acabar o shield some e o player começa a perder vida
-        //se a vida acabar o player morre
-        //se o player morrer o jogo acaba
-        //se o player perder vida ele precisa ter uns segundos de invencibilidade
-        //o player precisa sentir que morreu fazendo um screen shake e deixar a nave "piscando por uns segundos"
-        
+      
         this.shieldcusto = 0.1
         this.shield = true //voce começa com shield perde se esta abaixo de 0.1 de energia
 
@@ -1472,8 +1463,7 @@ class Player extends Phaser.Physics.Arcade.Sprite {
 
         this.velocidadetiro = 800
 
-        this.dashTimer = null;
-        this.dashCooldown = 300; // milliseconds
+      
 
         this.rocketLauncher = new RocketLauncher(this.scene, this);
 
@@ -1483,7 +1473,7 @@ class Player extends Phaser.Physics.Arcade.Sprite {
         this.scene.physics.add.collider(this, this.scene.GrupoTirosInimigos, this.ColisaoTiros, null, this);
         this.shield = this.scene.add.image(this.x, this.y, 'shield').setScale(1)
         .setAlpha(0.9)
-        this.dashTimer = this.scene.time.addEvent({ delay: this.dashCooldown, callback: this.dash, callbackScope: this, loop: false }); 
+        
 
         this.RocketDisparoTimer = this.scene.time.addEvent({ delay: missel.frequencia, callback: this.atiraMissel, callbackScope: this, loop: true }); 
        
@@ -1491,12 +1481,9 @@ class Player extends Phaser.Physics.Arcade.Sprite {
         //this.scene.powerupSelection()
     }
 
-
-    dash() {
-        this.candash = false
-    }
-
-
+ lifePU() {
+    this.scene.healthbarcolor.setScale(1, 1)
+ }
 
     
     atiraMissel () {
@@ -1541,8 +1528,7 @@ class Player extends Phaser.Physics.Arcade.Sprite {
         this.dano = 1
         this.frequenciadetiro = 1000
         this.velocidadetiro = 800
-        this.dashTimer = null;
-        this.dashCooldown = 1000; // milliseconds
+    
     }
 
     RecuperaEnergia() {
@@ -1636,54 +1622,9 @@ class Player extends Phaser.Physics.Arcade.Sprite {
         var justleft = Phaser.Input.Keyboard.JustDown(left)
         var justright = Phaser.Input.Keyboard.JustDown(right)
         
-        //mecanica de dash
-
+    
         
-       
-            if (this.candash) {
-                
-                if (justleft  &&   left.isDown) {
-                    if (this.scene.energybarcolor.scaleX > 0.1) {
-                        this.scene.energybarcolor.setScale(this.scene.energybarcolor.scaleX-0.1, 1)
-                    }else{return}
-                    if(this.scene.energybarcolor.scaleX<=0) this.scene.energybarcolor.scaleX = 0
-                    this.setAccelerationX(0)
-                    this.setDragX(-30000)
-                    this.setVelocityX(-800);
-                    this.smokeup()
-                    this.blink()
-                    this.candash = false
-                    this.dashTimer.reset(this.dashCooldown)
-                    
-                    
-                } else if (justright && right.isDown) {
-                    if (this.scene.energybarcolor.scaleX > 0.1) {
-                        this.scene.energybarcolor.setScale(this.scene.energybarcolor.scaleX-0.1, 1)
-                    }else{return}
-                    if(this.scene.energybarcolor.scaleX<=0) this.scene.energybarcolor.scaleX = 0
-                    this.setDragX(-30000)
-                    this.setAccelerationX(0)
-                    this.setVelocityX(800);
-                    this.smokeup()
-                    this.blink()
-                    this.candash = false
-                    this.dashTimer.reset(this.dashCooldown)
-                    
-
-                }
-
-            } else {
-                /*this.dashTimer = this.scene.time.delayedCall(this.dashCooldown, () => {
-                    this.dashTimer = null;
-                    this.setDragX(200)
-                    this.candash = true;
-                    
-                });*/
-
-
-            }
         
-        //this.scene.timedEvent = this.scene.time.addEvent({ delay: this.arma.frequencia, callback: this.atira, callbackScope: this, loop: true });
 
     }
 
@@ -1695,7 +1636,7 @@ class Player extends Phaser.Physics.Arcade.Sprite {
 
     smokeup()
     {
-        for (var i = 0; i < 7; i++) {
+        for (var i = 0; i < 3; i++) {
             new FX(this.scene, this.x-Phaser.Math.Between(-20,20), this.y+Phaser.Math.Between(-20,20), -1, ['fxsmoke'])
         }
 
@@ -1827,54 +1768,15 @@ class Player extends Phaser.Physics.Arcade.Sprite {
 
         
     }  
-/*
-        switch (this.tipodetiro) {
-            case 'P':
-
-                this.scene.GrupoTiros.add(new Tiro(this.scene, this.x, this.y, 1, 500, false, "tiro").setScale(2.4))
-                this.dano = 2
-                this.setfrequenciaTiro(1000);
-
-                break;
-            case 'B':
-                this.scene.GrupoTiros.add(new Tiro(this.scene, this.x, this.y, 1, 800, true, 'tiro2').setScale(0.4))
-                this.dano = 0.2
-                this.setfrequenciaTiro(100);
-                break;
-            case 'R':
-                this.scene.GrupoTiros.add(new Tiro(this.scene, this.x, this.y, 1, this.velocidadetiro, true, 'tiro3'))
-                this.dano = 0.4
-                this.setfrequenciaTiro(160);
-                break;
-            case 'E':
-                this.scene.GrupoTiros.add(new Tiro(this.scene, this.x, this.y, 1, this.velocidadetiro, false, 'tiro4').setScale(1.4))
-                this.setfrequenciaTiro(400);
-                break;
-            case 'S':
-                this.scene.GrupoTiros.add(new Tiro(this.scene, this.x, this.y, 1, this.velocidadetiro, false, 'tiro5'))
-                this.setfrequenciaTiro(1000);
-                break;
-            case 'S2':
-                this.scene.GrupoTiros.add(new Tiro(this.scene, this.x, this.y, 1, this.velocidadetiro, false, 'tiro6'))
-                break;
-            case 'D':
-                this.scene.GrupoTiros.add(new Tiro(this.scene, this.x, this.y, 1, this.velocidadetiro, false, 'tiro7'))
-                break;
-            default:
-                this.scene.GrupoTiros.add(new Tiro(this.scene, this.x, this.y, 1, this.velocidadetiro, false, 'tiro'))
-                break;
-        }
-        */
-
-    
-        
+       
     
     tomaDano(){
        
+        this.scene.cameras.main.shake(100, 0.01);
         if (this.scene.energybarcolor.scaleX > 0.1) {
             this.scene.energybarcolor.setScale(this.scene.energybarcolor.scaleX-0.4, 1)
         }else{
-            this.scene.healthbarcolor.setScale(this.scene.healthbarcolor.scaleX-0.1, 1)
+            this.scene.healthbarcolor.setScale(this.scene.healthbarcolor.scaleX-0.07, 1)
         }
 
         if (this.scene.healthbarcolor.scaleX <= 0) {
@@ -1902,8 +1804,13 @@ class Player extends Phaser.Physics.Arcade.Sprite {
       this.tiposdeWave = ['wavefacil', 'waveboss', 'wavecomplexa', 'waveMedia', 'waveDificil', 'waveMuitoDificil', 'waveInsana']
         this.tipoWave = 'wavefacil0'    
     
+    this.healthtext
+    this.energytext
+    this.evolutiontext
+    this.timebarcolor
 
-      this.quantidadeEstrelasFundo = 140
+
+      this.quantidadeEstrelasFundo = 20
 
       this.player;  
       this.fogo
@@ -1934,6 +1841,9 @@ class Player extends Phaser.Physics.Arcade.Sprite {
 
       this.energybarbg
       this.energybarcolor
+
+      this.evolutionbarbg
+      this.evolutionbarcolor
       
       this.imgLife = []
 
@@ -1943,10 +1853,10 @@ class Player extends Phaser.Physics.Arcade.Sprite {
         this.FXanims = []
 
         this.waveIndex = 0;
-        this.waveDuration = 20000; // duration of each wave in milliseconds
+        this.waveDuration = TempodeumaWave; // duration of each wave in milliseconds
         
         
-        this.timeBetweenWaves = 3000; // time between waves in milliseconds
+        this.timeBetweenWaves = TempoEntreWaves; // time between waves in milliseconds
         
 
         this.waveTimer = null;
@@ -1956,9 +1866,9 @@ class Player extends Phaser.Physics.Arcade.Sprite {
         this.waveText = null;
         this.waveTextTween = null;
 
-        this.tempoSpawnInimigo = 3000
-        this.width = 400
-        this.height = 600
+        this.tempoSpawnInimigo = tempoSpawnInimigo
+        this.width = width  
+        this.height = height
 
         this.thruster
 
@@ -1975,8 +1885,10 @@ class Player extends Phaser.Physics.Arcade.Sprite {
         this.level = 0
         this.updateUI()
         this.waveIndex = 0
+        this.evolutionbarcolor.setScale(0, 1);
         this.startNextWave()
         this.powerupSelection()
+      
     }
 
 
@@ -2048,20 +1960,16 @@ class Player extends Phaser.Physics.Arcade.Sprite {
        
        
  
-        this.waveTimer = this.time.addEvent({ delay: this.waveDuration, callback: this.betweenWaves, callbackScope: this, loop: false });
+        this.waveTimer = this.time.addEvent({ delay: TempodeumaWave, callback: this.betweenWaves, callbackScope: this, loop: false });
         //this.spawnTimer =  this.time.addEvent({ delay: this.tempoSpawnInimigo, callback: this.LancaAsteroide, callbackScope: this, loop: true });
-        this.GrupoSpawnerTimer = this.time.addEvent({ delay: this.tempoSpawnInimigo, callback: this.LancaSpawner, callbackScope: this, loop: true });
+        this.GrupoSpawnerTimer = this.time.addEvent({ delay: TempoEntreGruposInimigos, callback: this.LancaSpawner, callbackScope: this, loop: true });
        // new SpawnerTween(this, Phaser.Math.Between(0, 400), 10,'boss1',1)
 
 
     }
 
     LancaSpawner() {
-        /**
-         * aqui precisa mudar para usar as constantes de inimigos e não tipos
-         * 
-         */
-
+        
 
         const naves =  ['enemynave2','enemynave1']
         const waveFacil0 = [jelly,jelly2,bebezinho]
@@ -2081,46 +1989,41 @@ class Player extends Phaser.Physics.Arcade.Sprite {
         
 
         if (this.tipoWave === 'wavefacil0') {
-            console.log('wavefacil0')
             const escolha = Phaser.Math.Between(0, waveFacil0.length-1)
-            new Spawner(this, Phaser.Math.Between(10, 390), 10,waveFacil0[escolha],8)
+            new Spawner(this, Phaser.Math.Between(10, 390), 10,waveFacil0[escolha],waveFacil0[escolha].maxporgrupo)
             const escolha2 = Phaser.Math.Between(0, waveFacil0.length-1)
-            new Spawner(this, Phaser.Math.Between(10, 390), 10,waveFacil0[escolha2],8)
+            new Spawner(this, Phaser.Math.Between(10, 390), 10,waveFacil0[escolha2],waveFacil0[escolha2].maxporgrupo)
         
             this.tipoWave = 'wavefacil01'
             return
 
         }else if (this.tipoWave === 'wavefacil01') {
-            console.log('wavefacil01')
             const escolha = Phaser.Math.Between(0, waveFacil01.length-1)
-            new Spawner(this, Phaser.Math.Between(10, 350), 10,waveFacil01[escolha],4)
+            new Spawner(this, Phaser.Math.Between(10, 350), 10,waveFacil01[escolha],waveFacil01[escolha].maxporgrupo)
             const escolha2 = Phaser.Math.Between(0, waveFacil0.length-1)
-            new Spawner(this, Phaser.Math.Between(10, 350), 10,waveFacil0[escolha2],8)
+            new Spawner(this, Phaser.Math.Between(10, 350), 10,waveFacil0[escolha2],waveFacil0[escolha2].maxporgrupo)
            
             this.tipoWave = 'wavefacil02'
             return
 
             
         }else if (this.tipoWave === 'wavefacil02') {
-            console.log('wavefacil02')
             const escolha = Phaser.Math.Between(0, waveFacil02.length-1)
-            new Spawner(this, Phaser.Math.Between(10, 350), 10,waveFacil02[escolha],2)
+            new Spawner(this, Phaser.Math.Between(10, 350), 10,waveFacil02[escolha],waveFacil02[escolha].maxporgrupo)
             const escolha2 = Phaser.Math.Between(0, waveFacil02.length-1)
-            new Spawner(this, Phaser.Math.Between(10, 350), 10,waveFacil02[escolha2],1)
+            new Spawner(this, Phaser.Math.Between(10, 350), 10,waveFacil02[escolha2],waveFacil02[escolha2].maxporgrupo)
             this.tipoWave = 'wavefacil0'
             return
         
         }else if (this.tipoWave === 'wavefacil03') {
-            console.log('wavefacil03')
             const escolha = Phaser.Math.Between(0, waveFacil03.length-1)
-            new Spawner(this, Phaser.Math.Between(10, 350), 10,waveFacil03[escolha],3)
+            new Spawner(this, Phaser.Math.Between(10, 350), 10,waveFacil03[escolha],waveFacil03[escolha].maxporgrupo)
             
             this.tipoWave = 'wavefacil0'
             return
         }else if (this.tipoWave === 'wavemedia0') {
-            console.log('wavemedia0')
             const escolha = Phaser.Math.Between(0, waveMedia0.length-1)
-            new Spawner(this, Phaser.Math.Between(10, 350), 10,waveMedia0[escolha],4)
+            new Spawner(this, Phaser.Math.Between(10, 350), 10,waveMedia0[escolha],waveMedia0[escolha].maxporgrupo)
             
             this.tipoWave = 'wavemedia01'
             return
@@ -2161,7 +2064,7 @@ class Player extends Phaser.Physics.Arcade.Sprite {
 
             const escolha = Phaser.Math.Between(0, waveFacil0.length-1)
 
-            new Spawner(this, Phaser.Math.Between(0, 400), 10,waveFacil0[escolha],3)
+            new Spawner(this, Phaser.Math.Between(0, 400), 10,waveFacil0[escolha],waveFacil0[escolha].maxporgrupo)
 
         }
 
@@ -2273,31 +2176,53 @@ class Player extends Phaser.Physics.Arcade.Sprite {
 
 
     updateUI() {
-
         const ratio = 0.25;
         const n = 2;
-               
         
+       // const timeRatio = this.currentTime / this.maxTime;
+        
+
         for (var i = 0; i < this.player.vidas; i++) {
             this.imgLife[i].visible = true
         }
         this.textScore.setText('Score : ' + this.score);
         this.textLevel.setText('Level : ' + this.level);
 
+        this.evolutiontext.setText(Phaser.Math.FloorTo(this.nextlevelscore ));
+
+        
+        var valor = this.nextlevelscore - this.score
+
+        if (this.waveTimer){
+            this.timebarcolor.setScale(this.waveTimer.getProgress(), 1);
+        }else{
+            this.timebarcolor.setScale(0, 1);
+        }
+
+        
+        if (this.level < 1) {
+            this.evolutionbarcolor.setScale(valor/this.nextlevelscore, 1);
+        }else{
+            this.evolutionbarcolor.setScale(valor / this.nextlevelscore * 1.9, 1);
+        }
+        
+        
         if (this.nextlevelscore <= this.score) {
             this.level++;
             this.powerupSelection()
 
-            //calculo do valor do score necessario para o proximo level
-            this.nextlevelscore += 40 + (this.waveIndex * 1.8) 
+            // Cálculo do valor do score necessário para o próximo level
+            this.nextlevelscore += Math.pow(this.level, 1.5) * 30;
+
+            // Atualiza a barra de evoluçãao do jogador mostrando o quanto falta até o proximo level
             
-          
+            this.evolutionbarcolor.setScale(0, 1);
+            console.log("proximo score: "+this.nextlevelscore)
+
         }
+        
     }
-
-
-    // Exemplo de uso:
-    
+   
 createBackground(scene) {
     
     const width = scene.game.config.width;
@@ -2353,6 +2278,7 @@ createBackground(scene) {
                     repeat: -1,
                     yoyo: false,
                     onComplete: function(tween, target) {
+
                         target.destroy();
                     }
                 });
@@ -2390,14 +2316,10 @@ createBackground(scene) {
         this.GrupoTirosInimigos = new Phaser.GameObjects.Group(this)
         this.GrupoInimigos = new Phaser.GameObjects.Group(this)
         this.GrupoSatelites = new Phaser.GameObjects.Group(this)
-        //this.GrupoTirosInimigos.setGravityY(-11190)
-        this.player = new Player(this, this.width/2, this.height- 70)
+        this.player = new Player(this, this.width/2, this.height-70)
         
-        //this.fogo = this.add.sprite(this.player.x-6, this.player.y, 'fogo').setOrigin(0,0)
-        //this.fogo.play('fogo')
-        //this.fogo.scaleY = -1
-        this.thruster = this.add.particles(this.player.x, this.player.y+25, 'fxfire', {
-            scale: { start: 1, end: 0    },
+        this.thruster = this.add.particles(this.player.x, this.player.y+50, 'fxfire', {
+            scale: { start: 2, end: 0    },
             alpha: { start: 1, end: 0 },
             rotate: { start: 0, end: 360, ease: 'Back.easeOut' },
             speed: { min: -100, max: -100 },
@@ -2407,16 +2329,40 @@ createBackground(scene) {
             blendMode: 'ADD'
         });
 
-        
 
+        
+        
+        
+ 
+        
+        this.healthtext = this.add.text(33, 20, 'Health', { fontSize: '9px', fontFamily: 'PressStart2P', fill: '#FFFF00' }).setDepth(2);
+        
         this.healthbarbg = this.add.image(10, 10, 'healthbarbg').setOrigin(0,0).setDepth(1)
         this.healthbarcolor = this.add.image(19, 17, 'healthbar').setOrigin(0,0).setDepth(1)
 
+
+        this.add.text(10 + 120+ 15, 22, 'Energy', { fontSize: '8px', fontFamily: 'PressStart2P', fill: '#FFFF00' }).setDepth(2)
         this.energybarbg = this.add.image(10 + 120, 10+3, 'energybarbg').setOrigin(0,0).setDepth(1)
         this.energybarcolor = this.add.image(19 + 120, 17+3, 'energybar').setOrigin(0,0).setDepth(1)
 
 
-        this.textScore = this.add.text((this.width)-105, 20, 'Score : 0' ).setDepth(1);
+        this.evolutiontext = this.add.text(width - 98+20, 10 + 3 + 20+19 + 9, this.score + "/"+ this.nextlevelscore, { fontSize: '9px', fontFamily: 'PressStart2P', fill: '#FFFF00' }).setDepth(2)
+        this.evolutionbarbg = this.add.image(width - 98, 10 + 3 + 20+19, 'energybarbg').setOrigin(0, 0).setDepth(1);
+        this.evolutionbarcolor = this.add.image(width - 88 , 17 + 3 + 20+19, 'energybar').setOrigin(0, 0).setDepth(1).setTint(0x0fff00);
+        this.evolutionbarcolor.setScale(0, 1);
+
+        
+        this.timebarbg = this.add.image(width - 98, 10 + 3 + 20 + 19 + 23, 'energybarbg').setOrigin(0, 0).setDepth(1);
+        this.timebarcolor = this.add.image(width - 88, 17 + 3 + 20 + 19 + 23, 'energybar').setOrigin(0, 0).setDepth(1).setTint(0xff0000);
+        this.timebarcolor.setScale(1, 1);
+
+        this.timebarText = this.add.text(width - 98 + 22, 10 + 3 + 20 + 19 + 23 + 8, 'Time', { fontSize: '9px', fontFamily: 'PressStart2P', fill: '#FFFF00' }).setDepth(2);
+        this.timebarbg = this.add.image(width - 98, 10 + 3 + 20 + 19 + 23, 'energybarbg').setOrigin(0, 0).setDepth(1);
+        this.timebarcolor = this.add.image(width - 88, 17 + 3 + 20 + 19 + 23, 'energybar').setOrigin(0, 0).setDepth(1).setTint(0xff0000);
+        this.timebarcolor.setScale(1, 1);
+
+
+        this.textScore = this.add.text((this.width)-107, 20, 'Score : 0' ).setDepth(1);
         this.textScore.setFontSize(10);
         this.textScore.setFontFamily('PressStart2P');
         
@@ -2434,8 +2380,14 @@ createBackground(scene) {
             this.scene.start('scene-game')
         }, this)
         
-        this.betweenWaves();
 
+
+
+
+        this.startNextWave();
+
+
+   
         
 
     }
@@ -2443,78 +2395,9 @@ createBackground(scene) {
 
     addInimigo  (x = 0, y = 0,inimigo = 'enemynave1') {
 
-        //const inim = new Inimigo(this, x, y, inimigo) 
+        const inim = new Inimigo(this, x, y, inimigo) 
     }
-    
-    LancaAsteroide() {
-        //this.timedEvent.delay = Phaser.Math.Between(400, 1500)
-        this.inimigos10porcento = ["boss1", "boss2", "dude"]
-        this.inimigos25porcento = ["enemynave1", "enemynave4","boss3"]   
-        this.inimigos50porcento = ["astedoide","enemynave3", "enemynave2"]
-        this.inimigos100porcento = ["bebezinho", "jelly","jelly2", "asteroide" ]    
-       // this.updateUI()
-        this.porcentagem = Phaser.Math.Between(0, 100)
-        if (this.porcentagem <= 5){
-
-            //inimigos que podem ser criados com 10% de chance
-
-        
-            const selecionado = this.inimigos10porcento[Phaser.Math.Between(0, this.inimigos10porcento.length-1)]
-            
-            if (selecionado === "astedoide") {
-                const pattern = new AsteroidPattern(this);
-
-                pattern.createPattern(Phaser.Math.Between(0, 640), 0);
-                return
-            }     
-            
-            const inim = new Inimigo(this, Phaser.Math.Between(0, 640), 0, selecionado )
-            return
-
-
-
-        }else if (this.porcentagem <= 30 ) {
-            //inimigos que podem ser criados com 25% de chance
-            const selecionado = this.inimigos25porcento[Phaser.Math.Between(0, this.inimigos10porcento.length-1)]
-            if (selecionado === "astedoide") {
-                const pattern = new AsteroidPattern(this);
-
-                pattern.createPattern(Phaser.Math.Between(0, 640), 0);
-                return
-            }   
-
-            const inim = new Inimigo(this, Phaser.Math.Between(0, 640), 0, selecionado )
-            return
-        }else if (this.porcentagem <= 70 ) {
-            const selecionado = this.inimigos50porcento[Phaser.Math.Between(0, this.inimigos10porcento.length-1)]
-            if (selecionado === "astedoide") {
-                const pattern = new AsteroidPattern(this);
-
-                pattern.createPattern(Phaser.Math.Between(0, 640), 0);
-                return
-            }   
-            //inimigos que podem ser criados com 50% de chance
-            
-            const inim = new Inimigo(this, Phaser.Math.Between(0, 640), 0, selecionado )
-            return
-        
-       
-        }else if (this.porcentagem <= 100  ) {
-            const selecionado = this.inimigos100porcento[Phaser.Math.Between(0, this.inimigos10porcento.length-1)]
-            if (selecionado === "astedoide") {
-                const pattern = new AsteroidPattern(this);
-
-                pattern.createPattern(Phaser.Math.Between(0, 640), 0);
-                return
-            }   
-
-           //inimigos que podem ser criados com 100% de chance
-             
-              const inim = new Inimigo(this, Phaser.Math.Between(0, 640), 0, selecionado )
-              return
-        }
-     
-    }
+   
 }
 
 class Pausa extends Phaser.Scene {
@@ -2523,7 +2406,7 @@ class Pausa extends Phaser.Scene {
     }
 
     create() {
-        this.add.rectangle(400/2, 400/2, 600, 800, 0x000000, 0.5)
+        this.add.rectangle(400/2, 400/2, 600, 1500, 0x000000, 0.5)
         this.add.text(400/2-35, 600/2, 'PAUSE').setFontFamily('PressStart2P');
         this.input.keyboard.on('keydown-SPACE', function () {
             this.scene.resume('scene-game')
@@ -2560,18 +2443,18 @@ class Spawner {
         this.tipo = tipo
         this.qtd = qtd
 
-        this.SelfDestruct = this.scene.time.addEvent({ delay: this.scene.tempoSpawnInimigo, callback: this.destroi, callbackScope: this, loop: false });
-        this.lançaInimigo = this.scene.time.addEvent({ delay: 500, callback: this.LancaInimigo, callbackScope: this, loop: true });
+        this.SelfDestruct = this.scene.time.addEvent({ delay: tempoSpawnInimigo*this.qtd, callback: this.destroi, callbackScope: this, loop: false });
+        this.lançaInimigo = this.scene.time.addEvent({ delay: tempoSpawnInimigo, callback: this.LancaInimigo, callbackScope: this, loop: true });
     }
 
     destroi() {
         this.SelfDestruct = null
-        this.lançaInimigo.destroy()
         this.LancaInimigo = null
+        this.lançaInimigo.destroy()
+        
     }
     LancaInimigo() {
         
-
         const inim = new Inimigo(this.scene, this.x, this.y, this.tipo )
         this.scene.GrupoInimigos.add(inim)
         
@@ -2674,7 +2557,7 @@ class PowerUpSelectionScene extends Phaser.Scene {
     create() {
         // Crie os elementos visuais da cena, como botões para cada power up disponível
         
-         const powerups =[tiroP, tiroB, satelite, tiroD,  missel]
+         const powerups =[tiroP, tiroB, satelite, tiroD,  missel, life]
          const escolha1 = powerups[Phaser.Math.Between(0, powerups.length-1)]
          powerups.splice(powerups.indexOf(escolha1), 1)
          const escolha2 = powerups[Phaser.Math.Between(0, powerups.length-1)]
@@ -2698,7 +2581,7 @@ class PowerUpSelectionScene extends Phaser.Scene {
         const cardHeight = 170;
         const cardSpacing = 10;
         const startX = (this.cameras.main.width - (3 * cardWidth + 2 * cardSpacing)) +50;
-        const startY = 200;
+        const startY = 300;
 
         const powerUpButton1 = this.add.rectangle(startX, startY, cardWidth, cardHeight, 0x444444);
         const powerUpButton2 = this.add.rectangle(startX + cardWidth + cardSpacing, startY, cardWidth, cardHeight, 0x444444);
@@ -2737,7 +2620,10 @@ class PowerUpSelectionScene extends Phaser.Scene {
 
             }else{
 
-                if (escolha1.tipo != 'satelite' && escolha1.tipo != 'rocket') {
+               
+
+                if (escolha1.tipo != 'satelite' && escolha1.tipo != 'rocket' && escolha1.tipo != 'life' && escolha1.tipo != 'shield') {
+                    console.log(escolha1.tipo)
                     this.scene.get('scene-game').player.arma = escolha1
                     this.scene.get('scene-game').player.tipodetiro =escolha1.tipo
                     
@@ -2753,6 +2639,9 @@ class PowerUpSelectionScene extends Phaser.Scene {
                         }else{
                             this.scene.get('scene-game').player.hasRockets = true
                         }
+                    }else if(escolha1.tipo == 'life'){
+                        console.log('life')
+                        this.scene.get('scene-game').player.lifePU()
                     }
 
                 }
@@ -2773,12 +2662,13 @@ class PowerUpSelectionScene extends Phaser.Scene {
               //  this.scene.get('scene-game').player.timedEvent.delay -= 100
 
             }else{
-                console.log(escolha2.tipo)
-                if (escolha2.tipo != 'satelite' && escolha2.tipo != 'rocket') {
+              
+                if (escolha2.tipo != 'satelite' && escolha2.tipo != 'rocket' && escolha2.tipo != 'life' && escolha2.tipo != 'shield') {
                     this.scene.get('scene-game').player.arma =escolha2
                     this.scene.get('scene-game').player.tipodetiro =escolha2.tipo
                     this.scene.get('scene-game').player.timedEvent.delay = escolha2.frequencia
                 }else{
+
                     if (escolha2.tipo == 'satelite') {
                         this.scene.get('scene-game').player.lancaSatelite();
                     }else if(escolha2.tipo == 'rocket'){
@@ -2789,6 +2679,10 @@ class PowerUpSelectionScene extends Phaser.Scene {
                             this.scene.get('scene-game').player.hasRockets = true
                         }
                     
+                    }else if(escolha2.tipo == 'life'){
+                        console.log(escolha2.tipo)
+
+                        this.scene.get('scene-game').player.lifePU()
                     }
                 }
         }
@@ -2800,7 +2694,7 @@ class PowerUpSelectionScene extends Phaser.Scene {
         });
 
         powerUpButton3.setInteractive().on('pointerdown', () => {
-            // Lógica para construir o Power Up 3
+            // Lógica para construir o Power Up 3 
             //this.scene.get('scene-game').player.tipodetiro ='T'
             
 
@@ -2810,7 +2704,7 @@ class PowerUpSelectionScene extends Phaser.Scene {
                // this.scene.get('scene-game').player.timedEvent.delay -= 100
 
             }else{
-                if (escolha3.tipo != 'satelite' && escolha3.tipo != 'rocket') {
+                if (escolha3.tipo != 'satelite' && escolha3.tipo != 'rocket' && escolha3.tipo != 'life' && escolha3.tipo != 'shield' ) {
                     this.scene.get('scene-game').player.arma =escolha3
                     this.scene.get('scene-game').player.tipodetiro =escolha3.tipo
                     this.scene.get('scene-game').player.timedEvent.delay = escolha3.frequencia 
@@ -2820,10 +2714,12 @@ class PowerUpSelectionScene extends Phaser.Scene {
                     }else if(escolha3.tipo == 'rocket'){
                            if (this.scene.get('scene-game').player.hasRockets == true) {
                             this.scene.get('scene-game').player.nivelRockets += 1
-                        }else{
-                            this.scene.get('scene-game').player.hasRockets = true
                         }
                     
+                    }else if(escolha3.tipo == 'life'){
+                        console.log(escolha3.tipo)
+
+                        this.scene.get('scene-game').player.lifePU()
                     }
                 }
             }
@@ -2844,17 +2740,23 @@ class PowerUpSelectionScene extends Phaser.Scene {
 const config = {
     type: Phaser.WEBGL,
     width: 400,
-    height: 600,
+    height: 800,
     canvas: gameCanvas,
+    pixelArt: true,
+    fps:{
+        target: 60,
+        min: 30
+    },
     physics: {
       default: 'arcade',
       arcade: {
         gravity: { y: 0 },
         debug: false
       }
+
     },
     
-    scene: [TitleScene,GameScene,PowerUpSelectionScene , Pausa, GameOver]
-    //scene: [GameScene,PowerUpSelectionScene , TitleScene,Pausa, GameOver]
+    //scene: [TitleScene,GameScene,PowerUpSelectionScene , Pausa, GameOver]
+    scene: [GameScene,PowerUpSelectionScene , TitleScene,Pausa, GameOver]
   }
 const game = new Phaser.Game(config)
