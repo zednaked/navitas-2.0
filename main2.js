@@ -1,13 +1,16 @@
 //import './style.css'
 
 
-//import Phaser from 'phaser';
+import Phaser from 'phaser';
+import { title } from 'process';
 
 const tempoSpawnInimigo = 100; // Reduzindo o tempo de spawn dos inimigos para aumentar a intensidade do jogo
 const TempoEntreGruposInimigos = 1200; // Diminuindo o tempo entre grupos de inimigos para manter a ação constante
 const TempoEntreWaves = 1500; // Aumentando o tempo entre as waves para permitir momentos de recuperação entre os desafios
 const TempodeumaWave = 15000; // Reduzindo o tempo de uma wave para manter a jogabilidade intensa
 const tempoTextEntrewaves = 1000; // Reduzindo o tempo entre as waves para manter a jogabilidade intensa
+
+
 const width = 400
 const height = 800
 
@@ -70,7 +73,7 @@ const enemynave4 = {
             life: 2,
             criadude: true,
             segundoMovimento: false,
-            EventoMorre: 8000,
+            EventoMorre: 6000,
             frequenciadetiro: 2000,
             velocidadetiro: 2000,
             PodeMaior: true,
@@ -94,6 +97,7 @@ const enemynave1 = {
 
 const enemynave2 = {
     ...enemynave4,
+    EventoMorre: 4000,
     life: 3,
     drop: ['gem2','gem1'],
     score: 2,
@@ -117,10 +121,11 @@ const enemynave3 = {
 
 const bebezinho = {
     ...enemynave4,
-    maxporgrupo: 3,
+    maxporgrupo: 2,
     life: 1,
     drop: ['gem1','gem2'],
     vely: 350,
+    EventoMorre: 4000,
     hasThruster: false,
     criadude: false,
     tipo: 'bebezinho',
@@ -130,7 +135,8 @@ const bebezinho = {
 
 const dude = {
     ...enemynave4,
-    maxporgrupo: 3,
+    maxporgrupo: 2,
+    EventoMorre: 3000,
     life: 1,
     drop: ['gem1','gem2'],
     score: 1,
@@ -145,8 +151,9 @@ const dude = {
 const jelly = {
     ...enemynave4,
     maxporgrupo: 3,
-    life: 2,
+    life: 1,
     drop: ['gem1'],
+    EventoMorre: 3000,
     score: 1,
     vely: 450,
     criadude: false,
@@ -159,8 +166,9 @@ const jelly = {
 const jelly2 = {
     maxporgrupo: 4,
     ...enemynave4,
-    life: 1.5,
+    life: 1.2,
     drop: ['gem1'],
+    EventoMorre: 3000,
     score: 2,
     criadude: false,
     tipo: 'jelly2',
@@ -366,6 +374,23 @@ const life = {
     atira: false,
     tipo: 'life'
 }
+
+const nukem = {
+    nome:'Nukem',
+    descricao:'nukem',
+    icone: 'fulllife',
+    dano:1,
+    cooldown: 1000,
+    nivel: 1,
+    nivelmax: 3,
+    multiplicador: 0.25,
+    velocidadetiro: 300,
+    tempodevida: 600,
+    frequencia: 600,
+    atira: false,
+    tipo: 'nukem'
+}
+
 const shield = {
     nome:'Shield',
     descricao:'Shield',
@@ -756,7 +781,7 @@ class FX extends Phaser.Physics.Arcade.Sprite {
         this.scene = scene
         this.scene.physics.world.enable(this)
         this.scene.add.existing(this)
-        this.setScale(Phaser.Math.FloatBetween(1, 3))
+        this.setScale(Phaser.Math.FloatBetween(1.5,2.5 ))
         this.setVelocityY(0)
         
         this.play(fx)
@@ -915,139 +940,7 @@ class Inimigo extends Phaser.Physics.Arcade.Sprite {
 
         this.tipoinimigo = tipoinimigo.tipo
 
-        switch (tipoinimigo) {
-            case 'boss1':
-                this.life = 6
-                this.atirador= true
-                this.maior = true
-                this.smoker = true
-                this.EventoMorre = 10000
-                this.velocidadetiro = 1000
-                this.frequenciadetiro = 500
-                this.drops = ['gem4', 'gem5']
-                this.score = 20
-                
-                break;
-            case 'boss2':
-                this.life = 6
-                this.atirador= true
-                this.maior = true
-                this.velocidadetiro = 2000
-                this.frequenciadetiro = 700
-                this.EventoMorre = 10000
-                this.drops = ['gem4', 'gem5']
-                this.score = 20
-                break;
-            case 'boss3':
-                this.life = 6
-                this.atirador= true
-                this.maior = true
-                this.velocidadetiro = 1000
-                this.frequenciadetiro = 600
-                this.EventoMorre = 10000
-                this.drops = ['gem4', 'gem5']
-                this.score = 20
-                this.hasThruster = false
-                break;
-
-            case 'jelly':
-                this.life = 1
-                this.zigzag = true
-                this.smoker = true
-                this.segundoMovimento = true
-                this.EventoMorre = 2000
-                this.vely = 250
-                this.drops = ['gem1']
-                this.hasThruster = false
-                this.PodeMaior = true
-                break;
-            case 'jelly2':
-                this.life = 1
-                this.zigzag = true
-                this.segundoMovimento = true
-                this.EventoMorre = 2000
-                this.vely = 300
-                this.drops = ['gem1', 'gem2']
-                this.score = 5 
-                this.hasThruster = false
-                this.PodeMaior = true
-                break;
-
-            case 'dude':
-                this.atirador= true
-                this.velocidadetiro = 120
-                this.life = 1
-                this.EventoMorre = 3000
-                this.frequenciadetiro = 1400
-                this.vely = 200
-                this.drops = ['gem1', 'gem2']
-                this.score = 5
-                this.hasThruster = false
-                break;
-            
-        
-            case 'enemynave1'://complexa
-                this.atirador= true
-                this.segundoMovimento = true
-                this.life = 2
-                this.criadude = true
-                this.frequenciadetiro = 1000
-                this.velocidadetiro = 800
-                this.vely = 150
-                this.EventoMorre = 8000
-                this.drops  = ['gem1', 'gem2', "gem3" ]
-                this.score = 2
-                
-                
-                break;
-            case 'enemynave2':
-                this.atirador= true
-                this.EventoMorre = 6000
-                this.frequenciadetiro = 2000
-                this.velocidadetiro = 600
-                
-                this.life = 1
-                this.drops = ['gem1']
-                break;
-            case 'enemynave3':
-                this.atirador= true
-                this.life = 1
-                this.EventoMorre = 6000
-                this.velocidadetiro = 400
-                this.criadude = true
-                this.drops = ['gem1', 'gem2']
-                this.score = 1
-                break;
-            case 'enemynave4'://complexa
-                this.atirador= true
-                this.life = 2
-                this.criadude = true
-                this.segundoMovimento = true
-                this.EventoMorre = 8000
-                this.frequenciadetiro = 2000
-                this.velocidadetiro = 2000
-                this.PodeMaior = true
-                this.drop = ['gem1', 'gem2',"gem3"]
-                this.vely = 150
-                this.score = 3
-
-                break;
-            case 'bebezinho':
-                this.EventoMorre = 3000
-                this.frequenciadetiro = 2000
-                this.velocidadetiro = 100
-                this.atirador= true
-                this.life = 1
-                this.smoker = true
-                this.vely = 200
-               this.drops = ['gem1']
-              this.score = 1
-              this.hasThruster = false
-                break;
-
-            default:
-                break;
-        }
+       
         if (this.PodeMaior === true) {
             this.setScale(Math.random() < 0.1 ? 1.5 : 1) 
             if (this.scaleX > 1) {
@@ -1071,6 +964,7 @@ class Inimigo extends Phaser.Physics.Arcade.Sprite {
         this.setDragY(850)
 
         //this.tint = new Phaser.Display.Color(Phaser.Math.Between(0, 255), Phaser.Math.Between(0, 255), Phaser.Math.Between(0, 255)).color
+
         this.isCircle = true
         
         this.scene.physics.add.collider(this, this.scene.GrupoTiros, this.ColisaoTiros, null, this);
@@ -1098,6 +992,7 @@ class Inimigo extends Phaser.Physics.Arcade.Sprite {
 
         }
 
+        this.scene.GrupoInimigos.add(this)
     }
 
     smokeup()
@@ -1210,6 +1105,7 @@ class Inimigo extends Phaser.Physics.Arcade.Sprite {
             this.thruster.destroy()
         
         }
+        this.scene.GrupoInimigos.remove(this)
         
         this.smokeup()
         
@@ -1230,7 +1126,7 @@ class Inimigo extends Phaser.Physics.Arcade.Sprite {
             new FX(this.scene, this.x-desvio, this.y+desvio)
             desvio = Phaser.Math.Between(-10, 10)
             new FX(this.scene, this.x+desvio, this.y+desvio)
-            this.scene.GrupoInimigos.remove(this)
+            
             new Drop(this.scene, this.x, this.y, this.drops)
             
             this.destroi()
@@ -1318,7 +1214,12 @@ class Astedoide extends Phaser.Physics.Arcade.Sprite {
 
 
 class Tiro extends Phaser.Physics.Arcade.Sprite {
+
     constructor(scene, x, y, direcao = 1, velocidadetiro = 300, rocket = false, tipo = tiroP, inimigo = false ) {
+
+
+
+
         super(scene, x, y, tipo.tipo)
 
         this.scene = scene
@@ -1354,7 +1255,6 @@ class Tiro extends Phaser.Physics.Arcade.Sprite {
     }
     destroi() {
         this.timeEvent = null
-
         this.destroy()
     }   
 
@@ -1416,10 +1316,6 @@ class Player extends Phaser.Physics.Arcade.Sprite {
     constructor(scene, x, y) {
         super(scene, x, y, 'player')
 
-        
-        this.candash = false //ARRUMAR O DASH <=------------
-
-
         this.arma = tiroP
 
         this.tipodetiro = 'P'
@@ -1459,7 +1355,7 @@ class Player extends Phaser.Physics.Arcade.Sprite {
 
         this.GodMode = false //se true o player não toma dano
 
-
+       
 
         this.velocidadetiro = 800
 
@@ -1483,6 +1379,7 @@ class Player extends Phaser.Physics.Arcade.Sprite {
 
  lifePU() {
     this.scene.healthbarcolor.setScale(1, 1)
+    this.scene.energybarcolor.setScale(1, 1)
  }
 
     
@@ -1514,17 +1411,13 @@ class Player extends Phaser.Physics.Arcade.Sprite {
         this.energia = 1
         this.scene.healthbarcolor.setScale(1, 1)
         this.scene.energybarcolor.setScale(1, 1)
-        this.levelP = 0
-        this.levelB = 0
-        this.levelR = 0
-        this.levelE = 0
-        this.levelS = 0
-        this.levelS2 = 0
-        this.levelD = 0
+        this.level = 0
+        this.score = 0
         this.scene.score = 0
         this.scene.nextlevelscore = 30
         this.scene.updateUI()
         this.tipodetiro = 'P'
+        this.arma = tiroP
         this.dano = 1
         this.frequenciadetiro = 1000
         this.velocidadetiro = 800
@@ -1776,13 +1669,13 @@ class Player extends Phaser.Physics.Arcade.Sprite {
         if (this.scene.energybarcolor.scaleX > 0.1) {
             this.scene.energybarcolor.setScale(this.scene.energybarcolor.scaleX-0.4, 1)
         }else{
-            this.scene.healthbarcolor.setScale(this.scene.healthbarcolor.scaleX-0.07, 1)
+            this.scene.healthbarcolor.setScale(this.scene.healthbarcolor.scaleX-0.1, 1)
         }
 
         if (this.scene.healthbarcolor.scaleX <= 0) {
 
             this.scene.healthbarcolor.setScale(1, 1)
-            this.scene.imgLife[this.vidas].destroy()
+            
             this.vidas -= 1        
         }
 
@@ -1801,27 +1694,36 @@ class Player extends Phaser.Physics.Arcade.Sprite {
   class GameScene extends Phaser.Scene {
     constructor() {
       super('scene-game')
-      this.tiposdeWave = ['wavefacil', 'waveboss', 'wavecomplexa', 'waveMedia', 'waveDificil', 'waveMuitoDificil', 'waveInsana']
-        this.tipoWave = 'wavefacil0'    
     
-    this.healthtext
-    this.energytext
-    this.evolutiontext
-    this.timebarcolor
+        this.isTitleScreen = true
+    
+    
+      this.tiposdeWave = ['wavefacil', 'waveboss', 'wavecomplexa', 'waveMedia', 'waveDificil', 'waveMuitoDificil', 'waveInsana']
+    
+    
+      this.tipoWave = 'wavefacil0'    
+    
+        this.healthtext
+        this.energytext
+        this.evolutiontext
+        this.timebarcolor
+        this.vidasText
+        this.hudCima 
+        
 
+        
+        this.quantidadeEstrelasFundo = 20
 
-      this.quantidadeEstrelasFundo = 20
-
-      this.player;  
-      this.fogo
-      this.astedoide;
-      this.GrupoAsteroides 
-      this.GrupoTiros
-      this.AnimExplosao
-      this.AnimFogo
-      this.ImgAsteroides = []
+        this.player;  
+        this.fogo
+        this.astedoide;
+        this.GrupoAsteroides 
+        this.GrupoTiros
+        this.AnimExplosao
+        this.AnimFogo
+        this.ImgAsteroides = []
         this.nextlevelscore = 30
-      this.qtoporgrupo = 4
+        this.qtoporgrupo = 4
 
         this.GrupoTirosInimigos
         this.GrupoInimigos
@@ -1830,22 +1732,27 @@ class Player extends Phaser.Physics.Arcade.Sprite {
         this.GrupoDrops
         this.GrupoSatelites
 
+            
+
+        this.textScore
+        this.textLevel
+        this.timebarText
         
 
-      this.textScore
-      this.textLevel
-    
+        this.healthbarbg
+        this.healthbarcolor
 
-      this.healthbarbg
-      this.healthbarcolor
+        this.energybarbg
+        this.energybarcolor
 
-      this.energybarbg
-      this.energybarcolor
+        this.evolutionbarbg
+        this.evolutionbarcolor
+        
+        this.imgTiroCirculo
 
-      this.evolutionbarbg
-      this.evolutionbarcolor
-      
-      this.imgLife = []
+        this.imgTitleScreen
+
+        this.imgLife = []
 
         this.score = 0
         this.level = 0 
@@ -1867,12 +1774,13 @@ class Player extends Phaser.Physics.Arcade.Sprite {
         this.waveTextTween = null;
 
         this.tempoSpawnInimigo = tempoSpawnInimigo
+
         this.width = width  
         this.height = height
 
         this.thruster
 
-    }           
+        }           
 
     reset(){
         this.player.reset()
@@ -1883,6 +1791,7 @@ class Player extends Phaser.Physics.Arcade.Sprite {
         this.GrupoSatelites.clear(true, true)
         this.score = 0
         this.level = 0
+
         this.updateUI()
         this.waveIndex = 0
         this.evolutionbarcolor.setScale(0, 1);
@@ -1964,7 +1873,7 @@ class Player extends Phaser.Physics.Arcade.Sprite {
         //this.spawnTimer =  this.time.addEvent({ delay: this.tempoSpawnInimigo, callback: this.LancaAsteroide, callbackScope: this, loop: true });
         this.GrupoSpawnerTimer = this.time.addEvent({ delay: TempoEntreGruposInimigos, callback: this.LancaSpawner, callbackScope: this, loop: true });
        // new SpawnerTween(this, Phaser.Math.Between(0, 400), 10,'boss1',1)
-
+        
 
     }
 
@@ -2076,6 +1985,8 @@ class Player extends Phaser.Physics.Arcade.Sprite {
         this.load.image('bg1', 'assets/Background/3b.png')
         this.load.image('player', 'assets/Ship/2.png')
 
+        this.load.image('titlescreen','assets/HUD/title.png')
+
         this.load.image('emptylife', 'assets/HUD/EmptylLife.png')
 
         this.load.image('fulllife', 'assets/HUD/FullLife.png')
@@ -2085,7 +1996,12 @@ class Player extends Phaser.Physics.Arcade.Sprite {
         this.load.image('energybarbg', 'assets/HUD/EnergieBar.png')
         this.load.image('energybar', 'assets/HUD/EnergieBarColor.png')
 
+        //q: é possivel fazer isso  this.load.image('energybar',this.add.circle...
+        
+        
+        
 
+        this.load.image('hudCima','assets/HUD/top.png')
 
 
         //naves olhanco para cima
@@ -2176,29 +2092,22 @@ class Player extends Phaser.Physics.Arcade.Sprite {
 
 
     updateUI() {
-        const ratio = 0.25;
-        const n = 2;
+    
         
-       // const timeRatio = this.currentTime / this.maxTime;
-        
+        this.vidasText.setText('x' + this.player.vidas) 
+        this.textScore.setText('SCORE: ' + this.score);
+        this.textLevel.setText('LVL ' + this.level);
+    
 
-        for (var i = 0; i < this.player.vidas; i++) {
-            this.imgLife[i].visible = true
+
+        if (this.waveTimer)
+        {
+            this.timebarText.setText("T - "+ Phaser.Math.FloorTo(this.waveTimer.getRemainingSeconds()));
         }
-        this.textScore.setText('Score : ' + this.score);
-        this.textLevel.setText('Level : ' + this.level);
-
-        this.evolutiontext.setText(Phaser.Math.FloorTo(this.nextlevelscore ));
-
-        
         var valor = this.nextlevelscore - this.score
 
-        if (this.waveTimer){
-            this.timebarcolor.setScale(this.waveTimer.getProgress(), 1);
-        }else{
-            this.timebarcolor.setScale(0, 1);
-        }
 
+    
         
         if (this.level < 1) {
             this.evolutionbarcolor.setScale(valor/this.nextlevelscore, 1);
@@ -2265,7 +2174,7 @@ createBackground(scene) {
                 const newSpeed = Phaser.Math.Between(speedminz, speedmaxz);
                 const newDuration = Phaser.Math.Between(2000, 4000);
                 
-                const newStar = scene.add.circle(newX, newY, newSize, Phaser.Math.RND.pick([0xffff000, 0x55ff00, 0x5500ff]));
+                const newStar = scene.add.circle(newX, newY, newSize, Phaser.Math.RND.pick([0xffF4CB, 0x55ff00, 0x5500ff]));
                 
                 newStar.setAlpha(Phaser.Math.Between(0.3, 1));
                 starsGroup.add(newStar);
@@ -2286,7 +2195,43 @@ createBackground(scene) {
         });
     }
 }
-    create() {
+
+
+
+        criaUI (){
+
+
+            this.hudCima = this.add.image(-210, 30, 'hudCima').setOrigin(0,0).setDepth(1)
+        
+ 
+        
+            this.healthtext = this.add.text(88, 131, 'HP', { fontSize: '13px', fontFamily: 'PressStart2P', fill: '#FFFACB' }).setDepth(2);
+            
+            this.healthbarcolor = this.add.rectangle(61, 130, 76, 15, 0xff0000).setOrigin(0, 0).setDepth(1);
+    
+    
+            this.add.text(170, 131, 'ENERGY', { fontSize: '12px', fontFamily: 'PressStart2P', fill: '#FFFACB' }).setDepth(2)
+            this.energybarcolor = this.add.rectangle(167, 130, 76, 15, 0x4FFF00).setOrigin(0, 0).setDepth(1);
+            this.evolutiontext = this.add.text(278, 132 , "NXTLVL", { fontSize: '12px', fontFamily: 'PressStart2P', fill: '#FFFACB' }).setDepth(2)
+            this.evolutionbarcolor = this.add.rectangle(275, 130, 76, 15, 0xAA00CB).setOrigin(0, 0).setDepth(1);
+            this.evolutionbarcolor.setScale(0, 1);
+            this.timebarText = this.add.text(172, 79, 'T - 0', { fontSize: '12px', fontFamily: 'PressStart2P', fill: '#FFFACB' }).setDepth(2);
+            this.vidasText = this.add.text(103, 78, 'x 3', { fontSize: '14px', fontFamily: 'PressStart2P', fill: '#FFFACB' }).setDepth(2);
+            this.textScore = this.add.text(133, 11, 'Score : 0' ).setDepth(1);
+            this.textScore.setFontSize(19);
+            
+            this.textScore.setColor('#FFF4CB')
+            this.textScore.setFontFamily('PressStart2P');
+            
+            this.textLevel = this.add.text(282, 77, 'LVL 0' ).setDepth(1);
+            this.textLevel.setColor('#FFF4CB')
+            this.textLevel.setFontSize(12);
+            this.textLevel.setFontFamily('PressStart2P');
+    
+
+        }
+
+        create() {
         
         this.createBackground(this)
         this.anims.create({ key: 'fx1', frames: this.anims.generateFrameNumbers('fx1', { start: 0, end: 5 }), frameRate: 10, repeat: 0 })
@@ -2301,13 +2246,10 @@ createBackground(scene) {
         this.anims.create({ key: 'fxfire', frames: this.anims.generateFrameNumbers('fxfire', { start: 0, end: 5 }), frameRate: 10, repeat: 0 })
         this.anims.create({ key: 'fxsmoke', frames: this.anims.generateFrameNumbers('fxsmoke', { start: 0, end: 5 }), frameRate: 10, repeat: 0 })
 
-        this.imgLife[0] = this.add.image(10, 50, 'LifeIcon').setOrigin(0,0).setDepth(1)
-        this.imgLife[1] = this.add.image(40, 50, 'LifeIcon').setOrigin(0,0).setDepth(1)
-        this.imgLife[2] = this.add.image(70, 50, 'LifeIcon').setOrigin(0,0).setDepth(1)
-        this.imgLife[3] = this.add.image(100, 50, 'LifeIcon').setOrigin(0,0).setDepth(1)
+      
         
         this.AnimExplosao = this.anims.create({ key: 'explosao', frames: this.anims.generateFrameNumbers('explosao', { start: 0, end: 5 }), frameRate: 10, repeat: 0 })
-        this.AnimFogo = this.anims.create({ key: 'fogo', frames: this.anims.generateFrameNumbers('fogo', { start: 0, end: 5 }), frameRate: 10, repeat: -1 })
+        //this.AnimFogo = this.anims.create({ key: 'fogo', frames: this.anims.generateFrameNumbers('fogo', { start: 0, end: 5 }), frameRate: 10, repeat: -1 })
         
         this.rockets =  new Phaser.GameObjects.Group(this)
 
@@ -2316,64 +2258,29 @@ createBackground(scene) {
         this.GrupoTirosInimigos = new Phaser.GameObjects.Group(this)
         this.GrupoInimigos = new Phaser.GameObjects.Group(this)
         this.GrupoSatelites = new Phaser.GameObjects.Group(this)
-        this.player = new Player(this, this.width/2, this.height-70)
-        
-        this.thruster = this.add.particles(this.player.x, this.player.y+50, 'fxfire', {
-            scale: { start: 2, end: 0    },
-            alpha: { start: 1, end: 0 },
-            rotate: { start: 0, end: 360, ease: 'Back.easeOut' },
-            speed: { min: -100, max: -100 },
-            lifespan: 150,
-            frequency: 15,
-            gravityY: 11190,
-            blendMode: 'ADD'
-        });
-
+       
 
         
+
+
+        this.titleScreen()
+ 
+        this.input.keyboard.on('keydown', function () {
+            
+          this.destroy_titleScreen()
+        }, this)
         
         
  
-        
-        this.healthtext = this.add.text(33, 20, 'Health', { fontSize: '9px', fontFamily: 'PressStart2P', fill: '#FFFF00' }).setDepth(2);
-        
-        this.healthbarbg = this.add.image(10, 10, 'healthbarbg').setOrigin(0,0).setDepth(1)
-        this.healthbarcolor = this.add.image(19, 17, 'healthbar').setOrigin(0,0).setDepth(1)
+      
 
 
-        this.add.text(10 + 120+ 15, 22, 'Energy', { fontSize: '8px', fontFamily: 'PressStart2P', fill: '#FFFF00' }).setDepth(2)
-        this.energybarbg = this.add.image(10 + 120, 10+3, 'energybarbg').setOrigin(0,0).setDepth(1)
-        this.energybarcolor = this.add.image(19 + 120, 17+3, 'energybar').setOrigin(0,0).setDepth(1)
-
-
-        this.evolutiontext = this.add.text(width - 98+20, 10 + 3 + 20+19 + 9, this.score + "/"+ this.nextlevelscore, { fontSize: '9px', fontFamily: 'PressStart2P', fill: '#FFFF00' }).setDepth(2)
-        this.evolutionbarbg = this.add.image(width - 98, 10 + 3 + 20+19, 'energybarbg').setOrigin(0, 0).setDepth(1);
-        this.evolutionbarcolor = this.add.image(width - 88 , 17 + 3 + 20+19, 'energybar').setOrigin(0, 0).setDepth(1).setTint(0x0fff00);
-        this.evolutionbarcolor.setScale(0, 1);
-
-        
-        this.timebarbg = this.add.image(width - 98, 10 + 3 + 20 + 19 + 23, 'energybarbg').setOrigin(0, 0).setDepth(1);
-        this.timebarcolor = this.add.image(width - 88, 17 + 3 + 20 + 19 + 23, 'energybar').setOrigin(0, 0).setDepth(1).setTint(0xff0000);
-        this.timebarcolor.setScale(1, 1);
-
-        this.timebarText = this.add.text(width - 98 + 22, 10 + 3 + 20 + 19 + 23 + 8, 'Time', { fontSize: '9px', fontFamily: 'PressStart2P', fill: '#FFFF00' }).setDepth(2);
-        this.timebarbg = this.add.image(width - 98, 10 + 3 + 20 + 19 + 23, 'energybarbg').setOrigin(0, 0).setDepth(1);
-        this.timebarcolor = this.add.image(width - 88, 17 + 3 + 20 + 19 + 23, 'energybar').setOrigin(0, 0).setDepth(1).setTint(0xff0000);
-        this.timebarcolor.setScale(1, 1);
-
-
-        this.textScore = this.add.text((this.width)-107, 20, 'Score : 0' ).setDepth(1);
-        this.textScore.setFontSize(10);
-        this.textScore.setFontFamily('PressStart2P');
-        
-        this.textLevel = this.add.text((this.width)-105, 40, 'Level : 0' ).setDepth(1);
-        this.textLevel.setFontSize(10);
-        this.textLevel.setFontFamily('PressStart2P');
         this.input.keyboard.on('keydown-SPACE', function () {
             this.scene.pause()
             this.scene.launch('scene-pause');
             
         }, this)
+
 
         this.input.keyboard.on('keydown-ESC', function () {
             this.reset()
@@ -2383,16 +2290,49 @@ createBackground(scene) {
 
 
 
+        //this.criaUI()
 
-        this.startNextWave();
+        //this.player = new Player(this, this.width/2, this.height-70)
 
-
-   
+           //this.startNextWave();
         
+           
+    
 
     }
 
+    titleScreen()
+    {
 
+      this.imgTitleScreen = this.add.image(0,0 , 'titlescreen').setOrigin(0, 0).setScale(0.5);  
+
+    }
+
+    destroy_titleScreen()
+    {
+        if (!this.isTitleScreen) return
+            
+        this.isTitleScreen = false
+
+        this.criaUI()            
+        this.player = new Player(this, this.width/2, this.height-70)
+        this.startNextWave();
+        
+        this.thruster = this.add.particles(0, 0, 'fxfire', {
+            scale: { start: 2, end: 0    },
+            alpha: { start: 1, end: 0 },
+            rotate: { start: 0, end: 360, ease: 'Back.easeOut' },
+            speed: { min: -100, max: -100 },
+            lifespan: 150,
+            frequency: 15,
+            gravityY: 11190,
+            blendMode: 'ADD'
+        }).setDepth(1);
+        
+        this.imgTitleScreen.destroy()   
+
+
+    }
     addInimigo  (x = 0, y = 0,inimigo = 'enemynave1') {
 
         const inim = new Inimigo(this, x, y, inimigo) 
@@ -2557,7 +2497,7 @@ class PowerUpSelectionScene extends Phaser.Scene {
     create() {
         // Crie os elementos visuais da cena, como botões para cada power up disponível
         
-         const powerups =[tiroP, tiroB, satelite, tiroD,  missel, life]
+         const powerups =[tiroP, tiroB, satelite, tiroD,  missel, life, nukem]
          const escolha1 = powerups[Phaser.Math.Between(0, powerups.length-1)]
          powerups.splice(powerups.indexOf(escolha1), 1)
          const escolha2 = powerups[Phaser.Math.Between(0, powerups.length-1)]
@@ -2608,6 +2548,10 @@ class PowerUpSelectionScene extends Phaser.Scene {
         powerUpButton2.setScale(0.7);
         powerUpButton3.setScale(0.7);
 
+
+        //----- reescrever essa parte para ficar mais limpa esta repetindo codigo
+        // CONTINUE DAQUI, FOI FEITO APENAS O NUKEM NA PRIMEIRA CARTA, FALTA FAZER OS OUTROS
+
         // Adicione eventos de clique para cada botão
         powerUpButton1.setInteractive().on('pointerdown', () => {
             // Lógica para construir o Power Up 1
@@ -2622,7 +2566,7 @@ class PowerUpSelectionScene extends Phaser.Scene {
 
                
 
-                if (escolha1.tipo != 'satelite' && escolha1.tipo != 'rocket' && escolha1.tipo != 'life' && escolha1.tipo != 'shield') {
+                if (escolha1.tipo != 'satelite' && escolha1.tipo != 'rocket' && escolha1.tipo != 'life' && escolha1.tipo != 'shield' && escolha1.tipo != 'nukem') {
                     console.log(escolha1.tipo)
                     this.scene.get('scene-game').player.arma = escolha1
                     this.scene.get('scene-game').player.tipodetiro =escolha1.tipo
@@ -2642,6 +2586,14 @@ class PowerUpSelectionScene extends Phaser.Scene {
                     }else if(escolha1.tipo == 'life'){
                         console.log('life')
                         this.scene.get('scene-game').player.lifePU()
+                    }else if(escolha1.tipo == 'nukem'){
+                        console.log('nukem')
+                        
+                        this.scene.get('scene-game').GrupoInimigos.getChildren().forEach(enemy => {
+                                enemy.destroi();
+                            });
+                    
+
                     }
 
                 }
@@ -2714,6 +2666,8 @@ class PowerUpSelectionScene extends Phaser.Scene {
                     }else if(escolha3.tipo == 'rocket'){
                            if (this.scene.get('scene-game').player.hasRockets == true) {
                             this.scene.get('scene-game').player.nivelRockets += 1
+                        }else{
+                            this.scene.get('scene-game').player.hasRockets = true
                         }
                     
                     }else if(escolha3.tipo == 'life'){
