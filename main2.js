@@ -1,7 +1,7 @@
 //import './style.css'
 
 
-import Phaser from 'phaser';
+//import Phaser from 'phaser';
 import { title } from 'process';
 
 const tempoSpawnInimigo = 100; // Reduzindo o tempo de spawn dos inimigos para aumentar a intensidade do jogo
